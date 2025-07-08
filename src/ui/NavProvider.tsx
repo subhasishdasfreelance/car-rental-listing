@@ -16,8 +16,6 @@ import {
 import { Button } from "react-aria-components";
 import { useOnClickOutside } from "usehooks-ts";
 
-const navMenus = ["Menu1", "Menu2"];
-
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
 const NavContext = createContext<{
@@ -108,17 +106,12 @@ export function NavProvider({ children }: Props) {
 
           <div className="flex flex-col gap-8 justify-between h-[calc(100vh-10rem)]">
             {/* <MobileNavDisclosures /> */}
-            <div className="flex flex-col gap-4 px-4 mt-4">
-              {navMenus.map((item) => (
-                <Link
-                  key={item}
-                  className="font-medium text-lg text-center"
-                  href="#"
-                >
-                  {item}
-                </Link>
-              ))}
-            </div>
+            <Link
+              className="font-medium text-lg text-center text-red-500"
+              href="/auth"
+            >
+              User
+            </Link>
           </div>
         </div>
 
@@ -157,17 +150,12 @@ export function NavProvider({ children }: Props) {
                     </p>
                   </Link>
                 </div>
-                <div className="gap-4 xl:gap-6 items-center hidden lg:flex">
-                  {navMenus.map((item) => (
-                    <Link
-                      key={item}
-                      className="font-medium hover:scale-105 transition ease-in-out"
-                      href="#"
-                    >
-                      {item}
-                    </Link>
-                  ))}
-                </div>
+                <Link
+                  className="font-medium text-lg text-center text-red-500"
+                  href="/auth"
+                >
+                  User
+                </Link>
               </div>
             </div>
           </nav>
