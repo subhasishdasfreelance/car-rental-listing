@@ -4,7 +4,7 @@ import Modal from "@/ui/Modal";
 import TextField from "@/ui/TextField";
 import { parse } from "cookie";
 import { GetServerSideProps } from "next";
-import { useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import { Car } from "./api/car-list";
 
 export const getServerSideProps: GetServerSideProps = async ({ req }) => {
@@ -143,58 +143,13 @@ export default function Index({
       </Modal>
 
       <div className="container mx-auto px-4">
-        <div className="rounded-xl overflow-hidden border border-black/30">
-          <table className="w-full">
-            <tbody>
-              <tr className="">
-                <th className="text-left p-2">Name</th>
-                <th className="text-left p-2">details</th>
-                <th className="text-left p-2">Actions</th>
-              </tr>
-              {loadedCars.map((item) => {
-                return (
-                  <tr className="bg-white" key={item.id}>
-                    <td className="p-2">
-                      {item.id}.&nbsp;{item.name}
-                    </td>
-                    <td className="p-2">{item.details}</td>
-                    <td className="p-2 flex gap-2">
-                      <Btn
-                        onPress={() => handleApproval(item.id, true)}
-                        size="sm"
-                        isDisabled={item.approval == 1}
-                      >
-                        Approve
-                      </Btn>
-                      <Btn
-                        onPress={() => handleApproval(item.id, false)}
-                        size="sm"
-                        intent="danger"
-                        isDisabled={item.approval == 0}
-                      >
-                        Reject
-                      </Btn>
-                      <Btn
-                        size="sm"
-                        intent="clear"
-                        onPress={() => {
-                          setShowEditModal({ success: true, id: item.id });
-                          setDetailToEdit(
-                            loadedCars.find((carItem) => item.id === carItem.id)
-                              ?.details || ""
-                          );
-                        }}
-                      >
-                        Edit
-                      </Btn>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-
+        <h3 className="mb-2 mt-4">Cars List are shown below, we can edit them as we like</h3>
+        <CarsTable
+          loadedCars={loadedCars}
+          handleApproval={handleApproval}
+          setShowEditModal={setShowEditModal}
+          setDetailToEdit={setDetailToEdit}
+        />
         <div className="mt-4 flex justify-center pb-20 items-center gap-4">
           <Btn
             isDisabled={currentPage === 1}
@@ -214,3 +169,85 @@ export default function Index({
     </div>
   );
 }
+
+type CarsTableProps = {
+  loadedCars: Car[];
+  handleApproval: (id: string, approval: boolean) => Promise<void>;
+  setShowEditModal: Dispatch<
+    SetStateAction<{
+      success?: boolean;
+      id: string;
+    } | null>
+  >;
+  setDetailToEdit: Dispatch<SetStateAction<string>>;
+};
+const CarsTable = ({
+  loadedCars,
+  handleApproval,
+  setShowEditModal,
+  setDetailToEdit,
+}: CarsTableProps) => {
+  return (
+    <div className="rounded-xl overflow-hidden border border-black/30">
+      <table className="w-full">
+        <tbody>
+          <tr className="">
+            <th className="text-left p-2">Approved</th>
+            <th className="text-left p-2">Name</th>
+            <th className="text-left p-2">details</th>
+            <th className="text-left p-2">Actions</th>
+          </tr>
+          {loadedCars.map((item) => {
+            return (
+              <tr className="bg-white" key={item.id}>
+                <td className="p-2">
+                  <div
+                    className={`${
+                      item.approval ? "bg-green-500" : "bg-red-500"
+                    } size-6 rounded-full`}
+                  >
+                    {/* {item.approval} */}
+                  </div>
+                </td>
+                <td className="p-2">
+                  {item.id}.&nbsp;{item.name}
+                </td>
+                <td className="p-2">{item.details}</td>
+                <td className="p-2 flex gap-2">
+                  <Btn
+                    onPress={() => handleApproval(item.id, true)}
+                    size="sm"
+                    isDisabled={item.approval == 1}
+                  >
+                    Approve
+                  </Btn>
+                  <Btn
+                    onPress={() => handleApproval(item.id, false)}
+                    size="sm"
+                    intent="danger"
+                    isDisabled={item.approval == 0}
+                  >
+                    Reject
+                  </Btn>
+                  <Btn
+                    size="sm"
+                    intent="clear"
+                    onPress={() => {
+                      setShowEditModal({ success: true, id: item.id });
+                      setDetailToEdit(
+                        loadedCars.find((carItem) => item.id === carItem.id)
+                          ?.details || ""
+                      );
+                    }}
+                  >
+                    Edit
+                  </Btn>
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+  );
+};
