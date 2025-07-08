@@ -23,10 +23,14 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
     }
 
     const cars = db.prepare("SELECT * FROM cars LIMIT 10").all() as Car[];
+    const totalCars = db
+      .prepare("SELECT COUNT(*) as count FROM cars")
+      .get() as { count: number };
 
     return {
       props: {
         cars: cars,
+        totalPages: Math.ceil(totalCars.count / 10),
       },
     };
   } catch (err) {
@@ -39,15 +43,17 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
   }
 };
 
-export default function Index({ cars }: { cars: Car[] }) {
+export default function Index({
+  cars,
+  totalPages,
+}: {
+  cars: Car[];
+  totalPages: number;
+}) {
   const [loadedCars, setLoadedCars] = useState(cars);
-  const [offset, setOffset] = useState(10);
-  const [reachedEnd, setReachedEnd] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
 
-  console.log("loadedCars", loadedCars);
-  console.log("offset", offset);
-
-  const handleLoadMore = async () => {
+  const handlePagination = async (next: boolean) => {
     const response = await fetch("/api/car-list", {
       method: "POST",
       headers: {
@@ -55,20 +61,21 @@ export default function Index({ cars }: { cars: Car[] }) {
         "Content-Type": "application/json",
         "Accept-Encoding": "gzip, deflate, br",
       },
-      body: JSON.stringify({ offset }),
+      body: JSON.stringify({ page: next ? currentPage + 1 : currentPage - 1 }),
     });
 
     const result = await response.json();
     console.log("result", result);
 
-    if (result.data.length < 10) {
-      setReachedEnd(true);
-    }
+    setCurrentPage((prev) => {
+      console.log('prev', prev)
+      if (next && prev === totalPages) return prev;
+      if (!next && prev === 1) return prev;
 
-    setOffset((prev) => (prev += 10));
-    setLoadedCars((prev) => {
-      return [...prev, ...result.data];
+      return next ? prev + 1 : prev - 1;
     });
+
+    setLoadedCars(result.data);
   };
 
   console.log("cars", cars);
@@ -82,11 +89,11 @@ export default function Index({ cars }: { cars: Car[] }) {
               <th className="text-left px-2">details</th>
               <th className="text-left px-2">Actions</th>
             </tr>
-            {loadedCars.map((item, index) => {
+            {loadedCars.map((item) => {
               return (
                 <tr className="border rounded-xl bg-white" key={item.id}>
                   <td className="p-2">
-                    {index + 1}.&nbsp;{item.name}
+                    {item.id}.&nbsp;{item.name}
                   </td>
                   <td className="p-2">{item.details}</td>
                   <td className="p-2 flex gap-2">
@@ -101,9 +108,19 @@ export default function Index({ cars }: { cars: Car[] }) {
           </tbody>
         </table>
 
-        <div className="mt-4 flex justify-center pb-20">
-          <Btn isDisabled={reachedEnd} onPress={handleLoadMore}>
-            Load More
+        <div className="mt-4 flex justify-center pb-20 items-center gap-4">
+          <Btn
+            isDisabled={currentPage === 1}
+            onPress={() => handlePagination(false)}
+          >
+            Prev
+          </Btn>
+          <p>Current Page: {currentPage}</p>
+          <Btn
+            isDisabled={totalPages === currentPage}
+            onPress={() => handlePagination(true)}
+          >
+            Next
           </Btn>
         </div>
       </div>
