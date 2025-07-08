@@ -25,6 +25,8 @@ export default function handler(
     console.log("req.body", req.body);
     const {email, password} = req.body
 
+    console.log('email', email)
+
     const fetchedUser = db
       .prepare("SELECT * FROM users WHERE email = ?")
       .get(email) as User;
