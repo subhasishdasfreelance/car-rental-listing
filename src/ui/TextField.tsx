@@ -42,7 +42,6 @@ export default function TextField({
 					className={`border border-black/10 px-4 py-2 rounded-xl bg-pry/10 hover:border-black/30 focus:border-black/60 outline-none ease-out duration-200 ${inputAreaClassName}`}
 					rows={rows}
 					placeholder={placeholder}
-					type={type}
 				/>
 			) : (
 				<Input

@@ -3,7 +3,7 @@ import { parse } from "cookie";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 export type Car = {
-  id: number;
+  id: string;
   name: string;
   details: string;
 };
@@ -12,6 +12,11 @@ export default function handler(
   req: NextApiRequest,
   res: NextApiResponse<ResponseType<Car[]>>
 ) {
+  if (req.method !== "POST") {
+    res.status(405).json({ success: false, msg: "Method Not Allowed" });
+    return;
+  }
+
   try {
     const { page } = req.body;
     const cookies = parse(req.headers.cookie || "");

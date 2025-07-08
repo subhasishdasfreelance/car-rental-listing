@@ -1,5 +1,3 @@
-"use client";
-
 import { createPortal } from "react-dom";
 import { useEffect, ReactNode, useRef, FC } from "react";
 
@@ -134,7 +132,7 @@ export default function Modal({
               <Footer />
             ) : (
               <div className="flex gap-4 justify-end items-center mt-6">
-                <Btn intent="dropdown" onPress={closeModal}>
+                <Btn intent="clear" onPress={closeModal}>
                   Okay
                 </Btn>
               </div>

@@ -19,7 +19,7 @@ const buttonVariants = cva(
         primary:
           "relative bg-pry text-white backdrop-blur-md border border-white/10",
         clear:
-          "border border-black/30 data-[hovered]:border-black/30 data-[pressed]:border-black/60 outline-none ease-out duration-200 px-3 py-1 bg-transparent",
+          "border text-pry border-pry/30 data-[hovered]:border-pry/30 data-[pressed]:border-pry/60 outline-none ease-out duration-200 px-3 py-1 bg-transparent",
         danger: "border border-red-500/50 data-[hovered]:border-red-500/50 data-[pressed]:border-red-500/80 outline-none ease-out duration-200 px-3 py-1 bg-transparent text-red-500"
       },
       size: {

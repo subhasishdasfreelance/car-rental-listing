@@ -1,9 +1,11 @@
-import { parse } from "cookie";
-import { GetServerSideProps } from "next";
-import { Car } from "./api/car-list";
 import db from "@/lib/db";
 import { Btn } from "@/ui/Btn";
+import Modal from "@/ui/Modal";
+import TextField from "@/ui/TextField";
+import { parse } from "cookie";
+import { GetServerSideProps } from "next";
 import { useState } from "react";
+import { Car } from "./api/car-list";
 
 export const getServerSideProps: GetServerSideProps = async ({ req }) => {
   try {
@@ -52,6 +54,11 @@ export default function Index({
 }) {
   const [loadedCars, setLoadedCars] = useState(cars);
   const [currentPage, setCurrentPage] = useState(1);
+  const [showEditModal, setShowEditModal] = useState<null | {
+    success?: boolean;
+    id: string;
+  }>(null);
+  const [detailToEdit, setDetailToEdit] = useState<string>("");
 
   const handlePagination = async (next: boolean) => {
     const response = await fetch("/api/car-list", {
@@ -68,7 +75,7 @@ export default function Index({
     console.log("result", result);
 
     setCurrentPage((prev) => {
-      console.log('prev', prev)
+      console.log("prev", prev);
       if (next && prev === totalPages) return prev;
       if (!next && prev === 1) return prev;
 
@@ -78,35 +85,85 @@ export default function Index({
     setLoadedCars(result.data);
   };
 
-  console.log("cars", cars);
+  const handleUpdateDetail = async (id: string, detailToEdit: string) => {
+    try {
+      const response = await fetch("/api/car-edit", {
+        method: "PATCH",
+        headers: {
+          Accept: "*/*",
+          "Content-Type": "application/json",
+          "Accept-Encoding": "gzip, deflate, br",
+        },
+        body: JSON.stringify({ id, details: detailToEdit }),
+      });
+
+      console.log("response", response);
+    } catch (err) {
+      console.log("err", err);
+    }
+  };
+
   return (
     <div className="max-w-7xl mx-auto pt-[3.5rem]">
+      <Modal
+        success={showEditModal?.success}
+        isOpen={showEditModal !== null}
+        onClose={async () => {
+          await handleUpdateDetail(showEditModal?.id as string, detailToEdit);
+
+          setShowEditModal(null);
+          window.location.reload();
+        }}
+        header="Please Update Detail"
+      >
+        <TextField
+          value={detailToEdit || ""}
+          onChange={(ev) => setDetailToEdit(ev.target.value)}
+          label="Detail"
+        />
+      </Modal>
+
       <div className="container mx-auto px-4">
-        <table className="w-full">
-          <tbody>
-            <tr className="">
-              <th className="text-left px-2">Name</th>
-              <th className="text-left px-2">details</th>
-              <th className="text-left px-2">Actions</th>
-            </tr>
-            {loadedCars.map((item) => {
-              return (
-                <tr className="border rounded-xl bg-white" key={item.id}>
-                  <td className="p-2">
-                    {item.id}.&nbsp;{item.name}
-                  </td>
-                  <td className="p-2">{item.details}</td>
-                  <td className="p-2 flex gap-2">
-                    <Btn size="sm">Approve</Btn>
-                    <Btn size="sm" intent="danger">
-                      Reject
-                    </Btn>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+        <div className="rounded-xl overflow-hidden border border-black/30">
+          <table className="w-full">
+            <tbody>
+              <tr className="">
+                <th className="text-left p-2">Name</th>
+                <th className="text-left p-2">details</th>
+                <th className="text-left p-2">Actions</th>
+              </tr>
+              {loadedCars.map((item) => {
+                return (
+                  <tr className="bg-white" key={item.id}>
+                    <td className="p-2">
+                      {item.id}.&nbsp;{item.name}
+                    </td>
+                    <td className="p-2">{item.details}</td>
+                    <td className="p-2 flex gap-2">
+                      <Btn size="sm">Approve</Btn>
+                      <Btn size="sm" intent="danger">
+                        Reject
+                      </Btn>
+                      <Btn
+                        size="sm"
+                        intent="clear"
+                        onPress={() => {
+                          setShowEditModal({ success: true, id: item.id });
+                          setDetailToEdit(
+                            loadedCars.find((carItem) => item.id === carItem.id)
+                              ?.details || ""
+                          );
+                        }}
+                      >
+                        Edit
+                      </Btn>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
 
         <div className="mt-4 flex justify-center pb-20 items-center gap-4">
           <Btn

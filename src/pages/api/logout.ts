@@ -6,6 +6,10 @@ export default function handler(
   req: NextApiRequest,
   res: NextApiResponse<ResponseType>
 ) {
+  if (req.method !== "POST") {
+    res.status(405).json({ success: false, msg: "Method Not Allowed" });
+    return;
+  }
   try {
     res.setHeader(
       "Set-Cookie",
