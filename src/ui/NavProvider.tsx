@@ -2,26 +2,22 @@
 
 import { UIAnimationDuration } from "@/constant/ui";
 import { useGSAP } from "@gsap/react";
-import { ScrollTrigger } from "gsap/dist/ScrollTrigger";
-// import { ScrollSmoother } from "gsap/dist/ScrollSmoother";
 import gsap from "gsap";
+import { ScrollTrigger } from "gsap/dist/ScrollTrigger";
 import Link from "next/link";
 import {
   type ReactNode,
   type RefObject,
   createContext,
   useContext,
-  useEffect,
   useRef,
   useState,
 } from "react";
 import { Button } from "react-aria-components";
 import { useOnClickOutside } from "usehooks-ts";
-import { Btn } from "./Btn";
 
-const navMenus = ["Home", "About"];
+const navMenus = ["Menu1", "Menu2"];
 
-// gsap.registerPlugin(useGSAP, ScrollTrigger, ScrollSmoother);
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
 const NavContext = createContext<{
@@ -67,76 +63,27 @@ export function NavProvider({ children }: Props) {
     gsap.to(sidebarRef.current, { duration: UIAnimationDuration, x: "0" });
     gsap.fromTo(
       overlayRef.current,
-      { duration: UIAnimationDuration, opacity: "30%" },
-      { duration: UIAnimationDuration, opacity: "100%" }
+      {
+        duration: UIAnimationDuration,
+        background: "#ffff0000",
+        opacity: "30%",
+      },
+      {
+        duration: UIAnimationDuration,
+        background: "#00000000",
+        opacity: "100%",
+      }
     );
   });
 
   useOnClickOutside(sidebarRef as RefObject<HTMLElement>, closeSidebar);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      if (window.innerWidth < 1280) {
-        if (window.scrollY === 0) {
-          gsap.to(navRef.current, {
-            duration: UIAnimationDuration,
-            ease: "power1.in",
-            backdropFilter: "blur(0px)",
-            borderBottom: "0px",
-            background: "#00000000",
-          });
-        } else {
-          gsap.to(navRef.current, {
-            duration: UIAnimationDuration,
-            ease: "power1.out",
-            backdropFilter: "blur(16px)",
-            borderBottom: "1px solid rgba(255, 255, 255, 0.30)",
-            background: "#000000aa",
-          });
-        }
-
-        return;
-      }
-
-      if (window.scrollY === 0) {
-        gsap.to(navRef.current, {
-          duration: UIAnimationDuration,
-          ease: "power1.in",
-          borderRadius: 0,
-          marginTop: 0,
-          backdropFilter: "blur(0px)",
-          border: "0px",
-          width: "100%",
-          background: "#00000000",
-        });
-      } else {
-        gsap.to(navRef.current, {
-          duration: UIAnimationDuration,
-          ease: "power1.out",
-          borderRadius: "999999px",
-          marginTop: "0.25rem",
-          backdropFilter: "blur(16px)",
-          border: "1px solid rgba(255, 255, 255, 0.30)",
-          width: "80rem",
-          background: "#000000aa",
-        });
-      }
-    };
-    handleScroll();
-
-    window.addEventListener("scroll", handleScroll);
-
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, []);
 
   return (
     <NavContext.Provider value={{ openSidebar, closeSidebar }}>
       <div className="" ref={GSAPContainer}>
         {/* <div className="fixed lg:static left-0 top-0 h-screen border-r w-[18rem] bg-green-100 z-[99]"> */}
         <div
-          className="fixed lg:hidden left-[-18rem] top-0 h-screen border-r border-white/15 w-[18rem] max-w-full bg-black/50 backdrop-blur-md z-[99]"
+          className="fixed lg:hidden left-[-18rem] top-0 h-screen border-r border-white/15 w-[18rem] max-w-full bg-white z-[99]"
           ref={sidebarRef}
         >
           <div className="p-6 flex justify-end">
@@ -178,7 +125,7 @@ export function NavProvider({ children }: Props) {
         <div ref={overlayRef}>
           <nav
             ref={navRef}
-            className="fixed top-0 left-0 right-0 z-50 py-2 mx-auto"
+            className="fixed top-0 left-0 right-0 z-50 py-2 mx-auto backdrop-blur-2xl"
           >
             <div className="lg:max-w-7xl mx-auto">
               <div className="container mx-auto px-4 flex gap-6 justify-between items-center">
@@ -205,8 +152,8 @@ export function NavProvider({ children }: Props) {
                   </Button>
                   <Link href="/" className="relative font-medium flex-none">
                     {/* <Pic src="/global/logo-full.svg" alt="logo" /> */}
-                    <p className="text-3xl bg-linear-to-r from-pry to-sec whitespace-nowrap header">
-                      Subhasish Das
+                    <p className="text-3xl bg-pry whitespace-nowrap header">
+                      OneClickDrive
                     </p>
                   </Link>
                 </div>

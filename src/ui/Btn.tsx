@@ -17,9 +17,10 @@ const buttonVariants = cva(
     variants: {
       intent: {
         primary:
-          "relative bg-gradient-to-r from-[var(--pry)]/30 to-[var(--sec)]/30 text-white backdrop-blur-md border border-white/10 after:content-[''] after:absolute after:-inset-1 after:rounded-full after:bg-gradient-to-r after:from-pry after:to-sec after:blur-md after:opacity-70 after:z-[-1] after:mix-blend-overlay shadow-[inset_0_0_8px_2px_rgba(255,255,255,0.1),_inset_0_0_8px_1px_rgba(255,255,255,0.1)]",
-        dropdown:
-          "border border-white/30 data-[hovered]:border-white/30 data-[pressed]:border-white/60 outline-none ease-out duration-200 px-3 py-1 bg-black/30",
+          "relative bg-pry text-white backdrop-blur-md border border-white/10",
+        clear:
+          "border border-black/30 data-[hovered]:border-black/30 data-[pressed]:border-black/60 outline-none ease-out duration-200 px-3 py-1 bg-transparent",
+        danger: "border border-red-500/50 data-[hovered]:border-red-500/50 data-[pressed]:border-red-500/80 outline-none ease-out duration-200 px-3 py-1 bg-transparent text-red-500"
       },
       size: {
         sm: "py-1 md:py-1.5 px-3 text-sm",
@@ -95,7 +96,7 @@ export const Btn = ({
         <>
           <Spinner
             size={size}
-            intent={intent === "dropdown" ? undefined : intent}
+            intent={intent === "clear" ? undefined : intent}
           />
           &nbsp;
         </>
@@ -106,7 +107,7 @@ export const Btn = ({
           &nbsp;
           <Spinner
             size={size}
-            intent={intent === "dropdown" ? undefined : intent}
+            intent={intent === "clear" ? undefined : intent}
           />
         </>
       )}

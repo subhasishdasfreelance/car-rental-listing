@@ -5,7 +5,7 @@ import { useEffect, ReactNode, useRef, FC } from "react";
 
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
-import { UIAnimationDuration } from "@/constant";
+import { UIAnimationDuration } from "@/constant/ui";
 import { Btn } from "./Btn";
 
 gsap.registerPlugin(useGSAP);
@@ -87,14 +87,14 @@ export default function Modal({
     <div ref={portalRef}>
       <div
         ref={overlayRef}
-        className="fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-md z-[9999]"
+        className="fixed inset-0 flex items-center justify-center bg-white/50 backdrop-blur-md z-[9999]"
         role="dialog"
         aria-modal="true"
         onClick={closeModal}
       >
         <div
           ref={innerRef}
-          className="bg-black/50 border border-white/30 p-4 rounded-xl w-full max-w-md mx-4"
+          className="bg-white/50 border border-black/30 p-4 rounded-xl w-full max-w-md mx-4"
           onClick={(e) => e.stopPropagation()}
         >
           <p className="text-xl font-bold mb-2 flex items-center">

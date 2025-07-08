@@ -19,6 +19,7 @@ type Props = {
 	rows?: number;
 	placeholder?: string;
 	inputAreaClassName?: string;
+	type?: string;
 };
 
 export default function TextField({
@@ -29,6 +30,7 @@ export default function TextField({
 	rows,
 	placeholder,
 	inputAreaClassName,
+	type
 }: Props) {
 	return (
 		<AriaTextField className={twMerge("flex flex-col gap-1", className)}>
@@ -37,16 +39,18 @@ export default function TextField({
 				<TextArea
 					value={value}
 					onChange={onChange}
-					className={`border border-white/10 px-4 py-2 rounded-xl bg-[#1F2937] hover:border-white/30 focus:border-white/60 outline-none ease-out duration-200 ${inputAreaClassName}`}
+					className={`border border-black/10 px-4 py-2 rounded-xl bg-pry/10 hover:border-black/30 focus:border-black/60 outline-none ease-out duration-200 ${inputAreaClassName}`}
 					rows={rows}
 					placeholder={placeholder}
+					type={type}
 				/>
 			) : (
 				<Input
 					value={value}
 					onChange={onChange}
-					className={`border border-white/10 px-4 py-2 rounded-xl bg-[#1F2937] hover:border-white/30 focus:border-white/60 outline-none ease-out duration-200 ${inputAreaClassName}`}
+					className={`border border-black/10 px-4 py-2 rounded-xl bg-pry/10 hover:border-black/30 focus:border-black/60 outline-none ease-out duration-200 ${inputAreaClassName}`}
 					placeholder={placeholder}
+					type={type}
 				/>
 			)}
 		</AriaTextField>
