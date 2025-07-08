@@ -73,13 +73,14 @@ export default function Index({
       });
 
       console.log("response", response);
-      window.location.reload();
+      // window.location.reload();
+      handlePagination(null);
     } catch (err) {
       console.log("err", err);
     }
   };
 
-  const handlePagination = async (next: boolean) => {
+  const handlePagination = async (next: boolean | null) => {
     const response = await fetch("/api/car-list", {
       method: "POST",
       headers: {
@@ -87,19 +88,27 @@ export default function Index({
         "Content-Type": "application/json",
         "Accept-Encoding": "gzip, deflate, br",
       },
-      body: JSON.stringify({ page: next ? currentPage + 1 : currentPage - 1 }),
+      body: JSON.stringify({
+        page: next
+          ? currentPage + 1
+          : next === null
+          ? currentPage
+          : currentPage - 1,
+      }),
     });
 
     const result = await response.json();
     console.log("result", result);
 
-    setCurrentPage((prev) => {
-      console.log("prev", prev);
-      if (next && prev === totalPages) return prev;
-      if (!next && prev === 1) return prev;
+    if (next !== null) {
+      setCurrentPage((prev) => {
+        console.log("prev", prev);
+        if (next && prev === totalPages) return prev;
+        if (!next && prev === 1) return prev;
 
-      return next ? prev + 1 : prev - 1;
-    });
+        return next ? prev + 1 : prev - 1;
+      });
+    }
 
     setLoadedCars(result.data);
   };
@@ -131,7 +140,8 @@ export default function Index({
           await handleUpdateDetail(showEditModal?.id as string, detailToEdit);
 
           setShowEditModal(null);
-          window.location.reload();
+          // window.location.reload();
+          handlePagination(null);
         }}
         header="Please Update Detail"
       >
@@ -143,7 +153,9 @@ export default function Index({
       </Modal>
 
       <div className="container mx-auto px-4">
-        <h3 className="mb-2 mt-4">Cars List are shown below, we can edit them as we like</h3>
+        <h3 className="mb-2 mt-4">
+          Cars List are shown below, we can edit them as we like
+        </h3>
         <CarsTable
           loadedCars={loadedCars}
           handleApproval={handleApproval}
