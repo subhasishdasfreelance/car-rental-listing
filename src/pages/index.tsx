@@ -60,6 +60,25 @@ export default function Index({
   }>(null);
   const [detailToEdit, setDetailToEdit] = useState<string>("");
 
+  const handleApproval = async (id: string, approval: boolean) => {
+    try {
+      const response = await fetch("/api/approval", {
+        method: "PATCH",
+        headers: {
+          Accept: "*/*",
+          "Content-Type": "application/json",
+          "Accept-Encoding": "gzip, deflate, br",
+        },
+        body: JSON.stringify({ id, approval: approval ? 1 : 0 }),
+      });
+
+      console.log("response", response);
+      window.location.reload();
+    } catch (err) {
+      console.log("err", err);
+    }
+  };
+
   const handlePagination = async (next: boolean) => {
     const response = await fetch("/api/car-list", {
       method: "POST",
@@ -140,8 +159,19 @@ export default function Index({
                     </td>
                     <td className="p-2">{item.details}</td>
                     <td className="p-2 flex gap-2">
-                      <Btn size="sm">Approve</Btn>
-                      <Btn size="sm" intent="danger">
+                      <Btn
+                        onPress={() => handleApproval(item.id, true)}
+                        size="sm"
+                        isDisabled={item.approval == 1}
+                      >
+                        Approve
+                      </Btn>
+                      <Btn
+                        onPress={() => handleApproval(item.id, false)}
+                        size="sm"
+                        intent="danger"
+                        isDisabled={item.approval == 0}
+                      >
                         Reject
                       </Btn>
                       <Btn

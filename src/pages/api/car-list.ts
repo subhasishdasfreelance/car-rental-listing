@@ -6,6 +6,7 @@ export type Car = {
   id: string;
   name: string;
   details: string;
+  approval: 0 | 1;
 };
 
 export default function handler(
