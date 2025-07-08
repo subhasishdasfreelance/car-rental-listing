@@ -106,10 +106,7 @@ export function NavProvider({ children }: Props) {
 
           <div className="flex flex-col gap-8 justify-between h-[calc(100vh-10rem)]">
             {/* <MobileNavDisclosures /> */}
-            <Link
-              className="font-medium text-lg text-center text-red-500"
-              href="/auth"
-            >
+            <Link className="font-medium text-lg text-center" href="/auth">
               User
             </Link>
           </div>
@@ -151,7 +148,7 @@ export function NavProvider({ children }: Props) {
                   </Link>
                 </div>
                 <Link
-                  className="font-medium text-lg text-center text-red-500"
+                  className="font-medium text-lg text-center hidden lg:inline"
                   href="/auth"
                 >
                   User
