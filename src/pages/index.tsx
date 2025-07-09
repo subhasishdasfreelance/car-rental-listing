@@ -6,8 +6,12 @@ import { parse } from "cookie";
 import { GetServerSideProps } from "next";
 import { Dispatch, SetStateAction, useState } from "react";
 import { Car } from "./api/car-list";
+import { useRouter } from "next/router";
 
-export const getServerSideProps: GetServerSideProps = async ({ req }) => {
+export const getServerSideProps: GetServerSideProps = async ({
+  req,
+  query,
+}) => {
   try {
     const cookies = parse(req.headers.cookie || "");
     if (cookies.token !== process.env.TOKEN) {
@@ -24,10 +28,23 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
       };
     }
 
-    const cars = db.prepare("SELECT * FROM cars LIMIT 10").all() as Car[];
-    const totalCars = db
-      .prepare("SELECT COUNT(*) as count FROM cars")
-      .get() as { count: number };
+    const carsStmt = db.prepare(
+      `SELECT * FROM cars ${query.filter ? "WHERE approval = ?" : ""} LIMIT 10`
+    );
+
+    const cars = query.filter
+      ? (carsStmt.all(query.filter) as Car[])
+      : (carsStmt.all() as Car[]);
+
+    const countStmt = db.prepare(
+      `SELECT COUNT(*) as count
+    FROM cars
+    ${query.filter ? "WHERE approval = ?" : ""}`
+    );
+
+    const totalCars = query.filter
+      ? (countStmt.get(query.filter) as { count: number })
+      : (countStmt.get() as { count: number });
 
     return {
       props: {
@@ -60,8 +77,12 @@ export default function Index({
     id: string;
   }>(null);
   const [detailToEdit, setDetailToEdit] = useState<string>("");
+  const router = useRouter();
 
-  const handleApproval = async (id: string, approval: boolean) => {
+  const handleApproval = async (
+    id: string,
+    approval: "approved" | "rejected"
+  ) => {
     try {
       const response = await fetch("/api/approval", {
         method: "PATCH",
@@ -70,7 +91,7 @@ export default function Index({
           "Content-Type": "application/json",
           "Accept-Encoding": "gzip, deflate, br",
         },
-        body: JSON.stringify({ id, approval: approval ? 1 : 0 }),
+        body: JSON.stringify({ id, approval }),
       });
 
       console.log("response", response);
@@ -95,6 +116,7 @@ export default function Index({
           : next === null
           ? currentPage
           : currentPage - 1,
+        filter: router.query.filter,
       }),
     });
 
@@ -157,6 +179,47 @@ export default function Index({
         <h3 className="mb-2 mt-4">
           Cars List are shown below, we can edit them as we like
         </h3>
+
+        <div className="flex gap-2 mb-4">
+          <Btn
+            onPress={() => {
+              router.push({
+                pathname: router.pathname,
+                query: { ...router.query, filter: "approved" },
+              });
+            }}
+            size="sm"
+            intent="clear"
+          >
+            Approved Only
+          </Btn>
+          <Btn
+            onPress={() => {
+              router.push({
+                pathname: router.pathname,
+                query: { ...router.query, filter: "rejected" },
+              });
+            }}
+            size="sm"
+            intent="clear"
+          >
+            Rejected Only
+          </Btn>
+          <Btn
+            onPress={() => {
+              delete router.query.filter;
+              router.push({
+                pathname: router.pathname,
+                query: router.query,
+              });
+            }}
+            size="sm"
+            intent="clear"
+          >
+            All
+          </Btn>
+        </div>
+
         <CarsTable
           loadedCars={loadedCars}
           handleApproval={handleApproval}
@@ -185,7 +248,10 @@ export default function Index({
 
 type CarsTableProps = {
   loadedCars: Car[];
-  handleApproval: (id: string, approval: boolean) => Promise<void>;
+  handleApproval: (
+    id: string,
+    approval: "approved" | "rejected"
+  ) => Promise<void>;
   setShowEditModal: Dispatch<
     SetStateAction<{
       success?: boolean;
@@ -216,7 +282,9 @@ const CarsTable = ({
                 <td className="p-2">
                   <div
                     className={`${
-                      item.approval ? "bg-green-500" : "bg-red-500"
+                      item.approval === "approved"
+                        ? "bg-green-500"
+                        : "bg-red-500"
                     } size-6 rounded-full`}
                   >
                     {/* {item.approval} */}
@@ -228,17 +296,17 @@ const CarsTable = ({
                 <td className="p-2">{item.details}</td>
                 <td className="p-2 flex gap-2">
                   <Btn
-                    onPress={() => handleApproval(item.id, true)}
+                    onPress={() => handleApproval(item.id, "approved")}
                     size="sm"
-                    isDisabled={item.approval == 1}
+                    isDisabled={item.approval == "approved"}
                   >
                     Approve
                   </Btn>
                   <Btn
-                    onPress={() => handleApproval(item.id, false)}
+                    onPress={() => handleApproval(item.id, "rejected")}
                     size="sm"
                     intent="danger"
-                    isDisabled={item.approval == 0}
+                    isDisabled={item.approval == "rejected"}
                   >
                     Reject
                   </Btn>

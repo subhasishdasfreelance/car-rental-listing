@@ -26,7 +26,7 @@ export default function handler(
 
     console.log("id, approval", id, approval);
 
-    if (!id || ![0, 1].includes(approval)) {
+    if (!id || !["approved", "rejected"].includes(approval)) {
       res.status(400).json({ success: false, msg: "Payload isn't valid" });
       return;
     }
