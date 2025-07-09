@@ -1,10 +1,9 @@
+import { ReactNode, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
-import { useEffect, ReactNode, useRef, FC } from "react";
 
-import gsap from "gsap";
-import { useGSAP } from "@gsap/react";
 import { UIAnimationDuration } from "@/constant/ui";
-import { Btn } from "./Btn";
+import { useGSAP } from "@gsap/react";
+import gsap from "gsap";
 
 gsap.registerPlugin(useGSAP);
 
@@ -14,7 +13,6 @@ type ModalProps = {
   children: ReactNode;
   header: string;
   success?: boolean;
-  Footer?: FC;
 };
 
 export default function Modal({
@@ -22,7 +20,6 @@ export default function Modal({
   onClose,
   header,
   success,
-  Footer,
   children,
 }: ModalProps) {
   const portalRef = useRef<HTMLDivElement>(null);
@@ -126,18 +123,6 @@ export default function Modal({
             &nbsp;{header}
           </p>
           {children}
-          <div className="mt-6">
-            {Footer ? (
-              // <Footer closeModal={closeModal} />
-              <Footer />
-            ) : (
-              <div className="flex gap-4 justify-end items-center mt-6">
-                <Btn intent="clear" onPress={closeModal}>
-                  Okay
-                </Btn>
-              </div>
-            )}
-          </div>
         </div>
       </div>
     </div>,

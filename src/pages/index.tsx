@@ -173,11 +173,7 @@ export default function Index({
         success={showEditModal?.success}
         isOpen={showEditModal !== null}
         onClose={async () => {
-          await handleUpdateDetail(showEditModal?.id as string, detailToEdit);
-
           setShowEditModal(null);
-          // window.location.reload();
-          handlePagination({ next: null });
         }}
         header="Please Update Detail"
       >
@@ -186,6 +182,20 @@ export default function Index({
           onChange={(ev) => setDetailToEdit(ev.target.value)}
           label="Detail"
         />
+        <div className="mt-6 flex justify-end">
+          <Btn
+            onPress={async () => {
+              await handleUpdateDetail(
+                showEditModal?.id as string,
+                detailToEdit
+              );
+              await handlePagination({ next: null });
+              setShowEditModal(null);
+            }}
+          >
+            Update
+          </Btn>
+        </div>
       </Modal>
 
       <div className="container mx-auto px-4">
