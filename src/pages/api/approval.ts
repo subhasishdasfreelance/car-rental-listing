@@ -38,6 +38,10 @@ export default function handler(
     if (result.changes === 0) {
       res.status(404).json({ success: false, msg: "Car isn't found" });
     } else {
+      db.prepare(
+        "INSERT INTO audit_trail (email, action, timestamp) VALUES (?, ?, ?)"
+      ).run("subhasishdasfreelance@gmail.com", "approval updated", Date.now());
+
       res.status(200).json({ success: true, msg: "Car updated successfully" });
     }
   } catch (err) {
