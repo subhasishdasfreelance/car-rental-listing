@@ -15,11 +15,6 @@ export const getServerSideProps: GetServerSideProps = async ({
   try {
     const cookies = parse(req.headers.cookie || "");
     if (cookies.token !== process.env.TOKEN) {
-      // return {
-      //   props: {
-      //     cars: [],
-      //   },
-      // };
       return {
         redirect: {
           destination: "/auth",
@@ -27,6 +22,8 @@ export const getServerSideProps: GetServerSideProps = async ({
         },
       };
     }
+
+    console.log("here");
 
     const carsStmt = db.prepare(
       `SELECT * FROM cars ${query.filter ? "WHERE approval = ?" : ""} LIMIT 10`
@@ -96,13 +93,22 @@ export default function Index({
 
       console.log("response", response);
       // window.location.reload();
-      handlePagination(null);
+      handlePagination({ next: null });
     } catch (err) {
       console.log("err", err);
     }
   };
 
-  const handlePagination = async (next: boolean | null) => {
+  type HandlePaginationPrams = {
+    next?: boolean | null;
+    filter?: "approved" | "rejected";
+    page?: number;
+  };
+  const handlePagination = async ({
+    next,
+    filter,
+    page,
+  }: HandlePaginationPrams) => {
     const response = await fetch("/api/car-list", {
       method: "POST",
       headers: {
@@ -111,12 +117,14 @@ export default function Index({
         "Accept-Encoding": "gzip, deflate, br",
       },
       body: JSON.stringify({
-        page: next
+        page: page
+          ? page
+          : next
           ? currentPage + 1
           : next === null
           ? currentPage
           : currentPage - 1,
-        filter: router.query.filter,
+        filter: filter || router.query.filter,
       }),
     });
 
@@ -135,6 +143,8 @@ export default function Index({
 
     setLoadedCars(result.data);
   };
+
+  console.log("loadedCars", loadedCars);
 
   const handleUpdateDetail = async (id: string, detailToEdit: string) => {
     try {
@@ -164,7 +174,7 @@ export default function Index({
 
           setShowEditModal(null);
           // window.location.reload();
-          handlePagination(null);
+          handlePagination({ next: null });
         }}
         header="Please Update Detail"
       >
@@ -187,6 +197,7 @@ export default function Index({
                 pathname: router.pathname,
                 query: { ...router.query, filter: "approved" },
               });
+              handlePagination({ page: 1, filter: "approved" });
             }}
             size="sm"
             intent="clear"
@@ -199,6 +210,7 @@ export default function Index({
                 pathname: router.pathname,
                 query: { ...router.query, filter: "rejected" },
               });
+              handlePagination({ page: 1, filter: "rejected" });
             }}
             size="sm"
             intent="clear"
@@ -212,6 +224,7 @@ export default function Index({
                 pathname: router.pathname,
                 query: router.query,
               });
+              handlePagination({ page: 1 });
             }}
             size="sm"
             intent="clear"
@@ -229,14 +242,14 @@ export default function Index({
         <div className="mt-4 flex justify-center pb-20 items-center gap-4">
           <Btn
             isDisabled={currentPage === 1}
-            onPress={() => handlePagination(false)}
+            onPress={() => handlePagination({ next: false })}
           >
             Prev
           </Btn>
           <p>Current Page: {currentPage}</p>
           <Btn
             isDisabled={totalPages === currentPage}
-            onPress={() => handlePagination(true)}
+            onPress={() => handlePagination({ next: true })}
           >
             Next
           </Btn>
