@@ -18,4 +18,9 @@ export type ResponseType<T = undefined> = {
   data?: T
 };
 
+export const tokenToUser = {
+  "3n9uny683u498cy3n068vu3vn968yn": "subhasishdasfreelance@gmail.com",
+  "cny7yn357ynv45v7n646n456nyv587": "admin@admin.com",
+}
+
 export default db;

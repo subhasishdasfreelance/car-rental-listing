@@ -66,13 +66,22 @@ export default function Login({ loggedIn }: { loggedIn: boolean }) {
 
     const result = await response.json();
     console.log("result", result);
-    setShowConfirmModal({
-      success: true,
-      header: "Message Submitted!",
-      msg: "Your message is successfully sent. You'll be contacted through email shortly!",
-    });
 
-    updateFormState({ email: "", password: "" });
+    if (result.success) {
+      setShowConfirmModal({
+        success: true,
+        header: "Login success!",
+        msg: "Login is okay please go to / page",
+      });
+
+      updateFormState({ email: "", password: "" });
+    } else {
+      setShowConfirmModal({
+        success: false,
+        header: "Login failed!",
+        msg: "Please try again",
+      });
+    }
   };
 
   const handleLogout = async () => {
@@ -88,11 +97,20 @@ export default function Login({ loggedIn }: { loggedIn: boolean }) {
 
     const result = await response.json();
     console.log("result", result);
-    setShowConfirmModal({
-      success: true,
-      header: "Message Submitted!",
-      msg: "Your message is successfully sent. You'll be contacted through email shortly!",
-    });
+
+    if (result.success) {
+      setShowConfirmModal({
+        success: true,
+        header: "logout success!",
+        msg: "you have successfully logged out",
+      });
+    } else {
+      setShowConfirmModal({
+        success: false,
+        header: "Logout failed",
+        msg: "There was some problem while logging out",
+      });
+    }
 
     updateFormState({ email: "", password: "" });
   };
@@ -110,6 +128,16 @@ export default function Login({ loggedIn }: { loggedIn: boolean }) {
           header={showConfirmModal?.header || ""}
         >
           {showConfirmModal?.msg || ""}
+          <div className="flex justify-end mt-6">
+            <Btn
+              onPress={() => {
+                setShowConfirmModal(null);
+                window.location.reload();
+              }}
+            >
+              Okay
+            </Btn>
+          </div>
         </Modal>
 
         {!loggedIn ? (

@@ -1,4 +1,4 @@
-import db, { ResponseType } from "@/lib/db";
+import db, { ResponseType, tokenToUser } from "@/lib/db";
 import { parse } from "cookie";
 import type { NextApiRequest, NextApiResponse } from "next";
 
@@ -38,7 +38,11 @@ export default function handler(
     } else {
       db.prepare(
         "INSERT INTO audit_trail (email, action, timestamp) VALUES (?, ?, ?)"
-      ).run("subhasishdasfreelance@gmail.com", "details updated", Date.now());
+      ).run(
+        tokenToUser[process.env.TOKEN as keyof typeof tokenToUser],
+        "details updated",
+        Date.now()
+      );
 
       res.status(200).json({ success: true, msg: "Car updated successfully" });
     }
