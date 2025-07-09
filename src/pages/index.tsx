@@ -131,7 +131,9 @@ export default function Index({
     const result = await response.json();
     console.log("result", result);
 
-    if (next !== null) {
+    if (page) {
+      setCurrentPage(page);
+    } else if (next !== null) {
       setCurrentPage((prev) => {
         console.log("prev", prev);
         if (next && prev === totalPages) return prev;
