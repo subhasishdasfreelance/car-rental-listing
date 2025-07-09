@@ -38,8 +38,9 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
   } catch (err) {
     console.log("err", err);
     return {
-      props: {
-        cars: [],
+      redirect: {
+        destination: "/auth",
+        permanent: false,
       },
     };
   }
